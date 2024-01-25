@@ -4,7 +4,7 @@ from telethon import events
 
 # Your Telegram API ID, API Hash, and group chat ID
 api_id = '29880805'
-api_hash = '7499a71417d05232299609c8e9ad0bd0'
+api_hash = ''
 group_chat_id = -1001572494479  # Replace with your group's chat ID
 
 # Initialize the Telegram Client
