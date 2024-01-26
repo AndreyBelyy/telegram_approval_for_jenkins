@@ -3,7 +3,7 @@ from telethon import TelegramClient, events, Button
 
 
 import asyncio
-from Telethon import TelegramClient, events, Button
+from telethon import TelegramClient, events, Button
 
 api_id = ''
 api_hash = ''
