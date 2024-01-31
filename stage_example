@@ -1,0 +1,55 @@
+pipeline {
+    options {
+        ansiColor('xterm')
+    }
+    agent any
+    stages {
+        stage('Approval') {
+            steps {
+                dir("./builder") {
+                    git branch: 'master', 
+                        url: 'https://github.com/YOUR_REPOSITORY/elegram_notifier.git', 
+                        changelog: false, 
+                        credentialsId: 'GitHub-Token', 
+                        poll: false
+                    script {
+                        def exitCode = sh(script: "python3 approval_voting.py '⌛️ *${env.JOB_NAME}* #${env.BUILD_NUMBER} - *Deploy to PRODUCTION?* \n${env.BUILD_URL}'", returnStatus: true)
+                        if (exitCode != 0) {
+                            error("Deployment declined via Telegram.")
+                        }
+                    }
+                }
+            }
+        }
+        // Further stages as needed...
+    }
+    post {
+        success {
+            echo "SUCCESS"
+            dir("./builder") {
+                script {
+                    sh(script: "python3 send_notification.py '✅ *${env.JOB_NAME}* #${env.BUILD_NUMBER} - *SUCCESS* \n${env.BUILD_URL} \n Deployed'")
+                }
+            }
+        }
+        failure {
+            echo "FAILURE"
+            dir("./builder") {
+                script {
+                    sh(script: "python3 send_notification.py '❌ *${env.JOB_NAME}* #${env.BUILD_NUMBER} - *FAILED*, \nplease check ${env.BUILD_URL}'")
+                }
+            }
+        }
+        aborted {
+            echo "ABORTED"
+            dir("./builder") {
+                script {
+                    sh(script: "python3 send_notification.py '⚫️ *${env.JOB_NAME}* #${env.BUILD_NUMBER} - *ABORTED*, \nplease check ${env.BUILD_URL}'")
+                }
+            }
+        }
+        changed {
+            echo "Status Changed: [From: ${currentBuild.previousBuild.result}, To: ${currentBuild.result}]"
+        }
+    }
+}
