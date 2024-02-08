@@ -1,7 +1,7 @@
 import requests
 import time
 
-TOKEN = '6364842690:AAE5TxWzv02JbfGWEN40FASIbFkQMk1s_1E'
+TOKEN = ''
 URL = f"https://api.telegram.org/bot{TOKEN}/"
 
 def get_updates(offset=None):
