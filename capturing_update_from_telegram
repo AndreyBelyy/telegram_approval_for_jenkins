@@ -1,0 +1,36 @@
+import requests
+import time
+
+TOKEN = '6364842690:AAE5TxWzv02JbfGWEN40FASIbFkQMk1s_1E'
+URL = f"https://api.telegram.org/bot{TOKEN}/"
+
+def get_updates(offset=None):
+    """Fetches updates from Telegram API."""
+    params = {'timeout': 100, 'offset': offset}
+    response = requests.get(URL + 'getUpdates', params)
+    result_json = response.json()['result']
+    return result_json
+
+def handle_updates(updates):
+    """Handles incoming updates."""
+    for update in updates:
+        try:
+            if 'message' in update:
+                message_thread_id = update['message'].get('message_thread_id')
+                if message_thread_id:
+                    print(f"Found message_thread_id: {message_thread_id}")
+                    # Here you can add your logic to work with the message_thread_id
+        except Exception as e:
+            print(f"Error handling update: {e}")
+
+def main():
+    last_update_id = None
+    while True:
+        updates = get_updates(last_update_id)
+        if updates:
+            last_update_id = updates[-1]['update_id'] + 1
+            handle_updates(updates)
+        time.sleep(1)
+
+if __name__ == '__main__':
+    main()
